@@ -37,10 +37,11 @@ class EquipmentControllerTest {
 
     @Test
     void testVersionEndpoint() throws Exception {
-        mockMvc.perform(get("/api/version"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("1.0")));
-    }
+    mockMvc.perform(get("/api/version"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(containsString("2.0")))
+            .andExpect(content().string(containsString("CI/CD Redeployment Demo")));
+}
 
     @Test
     void testHealthEndpoint() throws Exception {

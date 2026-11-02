@@ -1,3 +1,4 @@
+
 package com.cia2.azure_cicd;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,8 +46,8 @@ public class EquipmentController {
     @GetMapping("/api/version")
     public Map<String, String> getVersion() {
         return Map.of(
-            "version", "1.0",
-            "deployment", "Initial Deployment"
+            "version", "2.0",
+            "deployment", "CI/CD Redeployment Demo"
         );
     }
 }
