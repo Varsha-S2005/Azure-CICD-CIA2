@@ -9,8 +9,12 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
-  build-and-test:
+  build-test-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,3 +33,38 @@ jobs:
 
       - name: Build Docker Image
         run: docker build -t azure-cicd:${{ github.sha }} .
+
+      - name: Azure Login
+        if: github.event_name == 'push'
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Login to Azure Container Registry
+        if: github.event_name == 'push'
+        run: az acr login --name acrcia2s2026
+
+      - name: Build and Push Image to ACR
+        if: github.event_name == 'push'
+        run: |
+          IMAGE=acrcia2s2026.azurecr.io/azure-cicd:${GITHUB_SHA}
+          docker build -t $IMAGE .
+          docker push $IMAGE
+
+      - name: Get AKS Credentials
+        if: github.event_name == 'push'
+        run: |
+          az aks get-credentials \
+            --resource-group rg-azure-cicd-cia2 \
+            --name aks-azure-cicd-cia2 \
+            --overwrite-existing
+
+      - name: Deploy to AKS
+        if: github.event_name == 'push'
+        run: |
+          sed -i "s|image: .*|image: acrcia2s2026.azurecr.io/azure-cicd:${GITHUB_SHA}|" k8s/deployment.yaml
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+          kubectl rollout status deployment/azure-cicd-deployment --timeout=180s
