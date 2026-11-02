@@ -1,0 +1,44 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: azure-cicd-deployment
+  labels:
+    app: azure-cicd
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: azure-cicd
+  template:
+    metadata:
+      labels:
+        app: azure-cicd
+    spec:
+      containers:
+        - name: azure-cicd
+          image: acrcia2s2026.azurecr.io/azure-cicd:1.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SERVER_PORT
+              value: "8080"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 45
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
