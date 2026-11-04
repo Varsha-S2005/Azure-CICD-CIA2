@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EquipEase | Equipment Management</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+
+    <header class="header">
+        <div class="brand">
+            <div class="brand-icon">E</div>
+            <div>
+                <h1>EquipEase</h1>
+                <p>Equipment Management System</p>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <span class="system-status">
+                <span class="status-dot"></span>
+                System Online
+            </span>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section class="welcome-section">
+            <div>
+                <p class="eyebrow">DASHBOARD</p>
+                <h2>Equipment Overview</h2>
+                <p class="subtitle">
+                    Manage equipment availability and bookings from one place.
+                </p>
+            </div>
+        </section>
+
+        <section class="summary-grid">
+
+            <div class="summary-card">
+                <p>Total Equipment</p>
+                <h3 id="totalEquipment">0</h3>
+                <span>Across all categories</span>
+            </div>
+
+            <div class="summary-card available-card">
+                <p>Available Units</p>
+                <h3 id="availableEquipment">0</h3>
+                <span>Ready for booking</span>
+            </div>
+
+            <div class="summary-card booked-card">
+                <p>Booked Units</p>
+                <h3 id="bookedEquipment">0</h3>
+                <span>Currently unavailable</span>
+            </div>
+
+        </section>
+
+        <section class="equipment-section">
+
+            <div class="section-heading">
+                <div>
+                    <h2>Equipment Inventory</h2>
+                    <p>View and manage available equipment.</p>
+                </div>
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search equipment..."
+                    aria-label="Search equipment"
+                >
+            </div>
+
+            <div id="message" class="message" role="status"></div>
+
+            <div id="equipmentList" class="equipment-grid">
+                <p class="loading">Loading equipment...</p>
+            </div>
+
+        </section>
+
+        <footer class="footer">
+            <p>EquipEase · Azure CI/CD Equipment Management</p>
+            <p>Application Version: <span id="appVersion">Loading...</span></p>
+        </footer>
+
+    </main>
+
+</body>
+</html>

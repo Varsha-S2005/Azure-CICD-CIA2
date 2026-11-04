@@ -12,15 +12,26 @@ on:
 permissions:
   contents: read
   id-token: write
+  pull-requests: write
 
 jobs:
   build-test-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout source code and full Git history
       - name: Checkout Source Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
+      # 2. Scan repository for exposed secrets
+      - name: Scan Repository with Gitleaks
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 3. Set up Java 17
       - name: Set Up Java 17
         uses: actions/setup-java@v4
         with:
@@ -28,12 +39,15 @@ jobs:
           java-version: '17'
           cache: maven
 
+      # 4. Build and test using Maven
       - name: Build and Test with Maven
         run: mvn -B clean verify
 
+      # 5. Build Docker image
       - name: Build Docker Image
         run: docker build -t azure-cicd:${{ github.sha }} .
 
+      # 6. Login to Azure
       - name: Azure Login
         if: github.event_name == 'push'
         uses: azure/login@v2
@@ -42,10 +56,12 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      # 7. Login to Azure Container Registry
       - name: Login to Azure Container Registry
         if: github.event_name == 'push'
         run: az acr login --name acrcia2s2026
 
+      # 8. Build and push Docker image
       - name: Build and Push Image to ACR
         if: github.event_name == 'push'
         run: |
@@ -53,6 +69,7 @@ jobs:
           docker build -t $IMAGE .
           docker push $IMAGE
 
+      # 9. Get AKS credentials
       - name: Get AKS Credentials
         if: github.event_name == 'push'
         run: |
@@ -61,6 +78,7 @@ jobs:
             --name aks-azure-cicd-cia2 \
             --overwrite-existing
 
+      # 10. Deploy application to AKS
       - name: Deploy to AKS
         if: github.event_name == 'push'
         run: |

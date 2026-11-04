@@ -19,13 +19,16 @@ class EquipmentControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    // Test frontend homepage
     @Test
     void testHomeEndpoint() throws Exception {
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/index.html"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(content().string(containsString("EquipEase")));
     }
 
+    // Test equipment API
     @Test
     void testGetAllEquipment() throws Exception {
         mockMvc.perform(get("/api/equipment"))
@@ -35,14 +38,16 @@ class EquipmentControllerTest {
                 .andExpect(content().string(containsString("Tablet")));
     }
 
+    // Test application version API
     @Test
     void testVersionEndpoint() throws Exception {
-    mockMvc.perform(get("/api/version"))
-            .andExpect(status().isOk())
-            .andExpect(content().string(containsString("2.0")))
-            .andExpect(content().string(containsString("CI/CD Redeployment Demo")));
-}
+        mockMvc.perform(get("/api/version"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("2.0")))
+                .andExpect(content().string(containsString("CI/CD Redeployment Demo")));
+    }
 
+    // Test application health API
     @Test
     void testHealthEndpoint() throws Exception {
         mockMvc.perform(get("/actuator/health"))

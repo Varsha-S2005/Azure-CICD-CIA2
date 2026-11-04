@@ -1,5 +1,4 @@
 
----
 - name: Deploy Azure CI/CD application to AKS
   hosts: local
   gather_facts: false
@@ -8,11 +7,13 @@
     - name: Apply Kubernetes deployment
       ansible.builtin.command:
         cmd: kubectl apply -f k8s/deployment.yaml
+        chdir: "{{ playbook_dir }}/.."
       register: deployment_result
       changed_when: "'configured' in deployment_result.stdout or 'created' in deployment_result.stdout"
 
     - name: Apply Kubernetes service
       ansible.builtin.command:
         cmd: kubectl apply -f k8s/service.yaml
+        chdir: "{{ playbook_dir }}/.."
       register: service_result
       changed_when: "'configured' in service_result.stdout or 'created' in service_result.stdout"
